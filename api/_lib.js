@@ -15,4 +15,13 @@ export const role = (req) => {
   const r = req.headers['x-role'];
   return r === 'shop' || r === 'courier' ? r : null;
 };
-export const lines = (o) => o.items.map((i) => `• ${i.name} × ${i.qty}`).join('\n');
+export const lines = (o) => o.items.map((i) => `• ${i.name} × ${i.qty} — ${i.from || 'Склад'}`).join('\n');
+export const tgHtml = (chat, text) => tg(chat, text, { parse_mode: 'HTML', link_preview_options: { is_disabled: true } });
+// Google Sheets (ixtiyoriy): GOOGLE_SCRIPT_URL berilmasa hech narsa qilmaydi
+export const sheet = (order) =>
+  process.env.GOOGLE_SCRIPT_URL
+    ? fetch(process.env.GOOGLE_SCRIPT_URL, {
+        method: 'POST', headers: { 'content-type': 'text/plain' },
+        body: JSON.stringify({ secret: process.env.GOOGLE_SCRIPT_SECRET, order }),
+      }).catch(() => {})
+    : Promise.resolve();

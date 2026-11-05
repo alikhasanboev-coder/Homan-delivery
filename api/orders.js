@@ -1,4 +1,5 @@
-import { db, norm, tg, role, lines } from './_lib.js';
+import { db, norm, tg, tgHtml, role, lines, sheet } from './_lib.js';
+import { MSG } from './config.js';
 
 export default async function handler(req, res) {
   const who = role(req);
@@ -16,7 +17,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST' && who === 'shop') {
     const { name, phone, address, items, comment } = req.body || {};
-    const clean = (items || []).filter((i) => i.name && i.name.trim()).map((i) => ({ name: i.name.trim().slice(0, 120), qty: Math.max(1, +i.qty || 1) }));
+    const clean = (items || []).filter((i) => i.name && i.name.trim()).map((i) => ({ name: i.name.trim().slice(0, 120), qty: Math.max(1, +i.qty || 1), from: i.from === 'Магазин' ? 'Магазин' : 'Склад' }));
     if (!name || norm(phone).length < 9 || !address || !clean.length) return res.status(400).json({ error: 'Заполните все поля' });
     const o = {
       id: Date.now().toString(36), created: Date.now(), status: 'new',
@@ -28,7 +29,8 @@ export default async function handler(req, res) {
     const txt = `🆕 Новый заказ\n\n${o.name}\n${o.phone}\n${o.address}\n\n${lines(o)}${o.comment ? '\n\n💬 ' + o.comment : ''}`;
     await Promise.all(couriers.map((c) => tg(c, txt)));
     const chat = await db('HGET', 'chats', norm(o.phone));
-    if (chat) await tg(chat, 'Ваш заказ принят и скоро будет передан курьеру.');
+    await sheet(o);
+    if (chat) await tgHtml(chat, MSG.accepted);
     return res.json({ ok: true, order: o });
   }
 
@@ -42,7 +44,8 @@ export default async function handler(req, res) {
     o[status + 'At'] = Date.now();
     await db('HSET', 'orders', id, JSON.stringify(o));
     const chat = await db('HGET', 'chats', norm(o.phone));
-    if (chat) await tg(chat, status === 'going' ? '🚚 Ваш заказ выехал. Курьер уже в пути.' : '✅ Ваш заказ доставлен. Спасибо, что выбрали Homan!');
+    await sheet(o);
+    if (chat) await tgHtml(chat, status === 'going' ? MSG.going : MSG.done);
     return res.json({ ok: true, order: o });
   }
 

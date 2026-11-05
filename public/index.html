@@ -4,56 +4,77 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Homan — Доставка</title>
+<script>try{var t=localStorage.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme='light'}</script>
 <style>
 @font-face{font-family:Actay;src:url(fonts/Actay-Regular.otf);font-weight:400}
 @font-face{font-family:Actay;src:url(fonts/ActayWide-Bold.otf);font-weight:700}
-:root{--y:#FAB31C;--r:#EE3A44;--ink:#161616;--mut:#77777a;--line:#e6e6e8;--bg:#f5f5f6;--card:#fff;--ok:#1f9d55}
-@media(prefers-color-scheme:dark){:root{--ink:#f2f2f3;--mut:#9b9ba0;--line:#2b2b2f;--bg:#0f0f10;--card:#18181a}}
+:root{--acc:#2563EB;--on:#fff;--r:#EE3A44;--ok:#1f9d55;--ink:#0b0b0c;--mut:#6b6b70;--line:#e4e4e7;--bg:#fff;--soft:#f4f4f5;--card:#fff}
+html[data-theme=dark]{--ink:#f4f4f5;--mut:#9a9aa0;--line:#26262a;--bg:#0a0a0a;--soft:#17171a;--card:#101012}
+body[data-role=courier]{--acc:#FAB31C;--on:#161616}
 *{box-sizing:border-box;margin:0}
 body{font:400 15px/1.45 Actay,system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
-h1,h2,.b{font-weight:700;letter-spacing:.01em}
-header{background:#141414;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-header img{height:30px}
-.brand{display:flex;align-items:center;gap:14px}.brand span{font:400 18px Actay,system-ui,sans-serif;color:#c9c9cc;letter-spacing:.06em;padding-left:14px;border-left:1px solid #444;line-height:1.1}
-header button{background:none;border:1px solid #444;color:#bbb;border-radius:8px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+h1,h2,.b{font-weight:700}
+header{background:#0a0a0a;border-bottom:1px solid #222;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:14px}.brand img{height:30px}
+.brand span{font:400 18px Actay,system-ui,sans-serif;color:#c9c9cc;letter-spacing:.06em;padding-left:14px;border-left:1px solid #444;line-height:1.1}
+.hb{display:flex;gap:8px}
+header button{background:none;border:1px solid #3a3a3e;color:#cfcfd2;border-radius:8px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;display:flex;align-items:center}
+header svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#th .sun{display:none}html[data-theme=dark] #th .sun{display:block}html[data-theme=dark] #th .moon{display:none}
 main{max-width:760px;margin:0 auto;padding:24px 16px 80px}
-.pick{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
-.pick button,.card{background:var(--card);border:1px solid var(--line);border-radius:14px}
-.pick button{padding:36px 16px;font:700 18px Actay;color:var(--ink);cursor:pointer;transition:border-color .15s}
-.pick button:hover,.pick button:focus-visible{border-color:var(--y);outline:none}
-.pick small{display:block;font:400 13px Actay;color:var(--mut);margin-top:6px}
-.card{padding:18px;margin-bottom:12px}
+#pick{min-height:calc(100vh - 150px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+#pick h1{font-size:24px;margin-bottom:20px}
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:520px}
+.pick button{padding:46px 14px;border:0;border-radius:16px;font:700 20px Actay,system-ui;cursor:pointer;transition:transform .15s}
+.pick button:hover{transform:translateY(-2px)}.pick button:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.pick small{display:block;font:400 13px Actay,system-ui;margin-top:6px;opacity:.8}
+.shop{background:#2563EB;color:#fff}.cour{background:#FAB31C;color:#161616}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:12px}
 label{display:block;font-size:13px;color:var(--mut);margin:12px 0 5px}
-input,textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
-input:focus,textarea:focus{outline:2px solid var(--y);outline-offset:-1px}
-.row{display:grid;grid-template-columns:1fr 72px 40px;gap:8px;margin-bottom:8px}
-.btn{font:700 15px Actay;border:0;border-radius:10px;padding:13px 18px;cursor:pointer;background:var(--y);color:#161616}
+input,textarea{width:100%;font:inherit;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+input:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:-1px}
+.item{border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px}
+.row{display:grid;grid-template-columns:1fr 72px 40px;gap:8px}
+.src{display:flex;gap:8px;margin-top:8px}
+.src label{display:block;margin:0;position:relative}
+.src input{position:absolute;opacity:0;width:auto;padding:0;border:0}
+.src span{display:block;padding:7px 16px;border:1px solid var(--line);border-radius:99px;cursor:pointer;font-size:14px;color:var(--mut)}
+.src input:checked+span{background:var(--acc);border-color:var(--acc);color:var(--on)}
+.src input:focus-visible+span{outline:2px solid var(--ink);outline-offset:2px}
+.btn{font:700 15px Actay,system-ui;border:0;border-radius:10px;padding:13px 18px;cursor:pointer;background:var(--acc);color:var(--on)}
 .btn.red{background:var(--r);color:#fff}.btn.ghost{background:none;border:1px dashed var(--line);color:var(--mut);font-weight:400}
 .btn.full{width:100%;margin-top:16px}.btn:disabled{opacity:.5}
 .x{background:none;border:1px solid var(--line);border-radius:10px;color:var(--mut);cursor:pointer;font-size:18px}
 .tabs{display:flex;gap:6px;margin:4px 0 16px}
-.tabs button{flex:1;font:700 14px Actay;padding:11px;border:1px solid var(--line);background:var(--card);color:var(--mut);border-radius:10px;cursor:pointer}
-.tabs button.on{color:var(--ink);border-color:var(--y);box-shadow:inset 0 -3px 0 var(--y)}
+.tabs button{flex:1;font:700 14px Actay,system-ui;padding:11px;border:1px solid var(--line);background:var(--card);color:var(--mut);border-radius:10px;cursor:pointer}
+.tabs button.on{color:var(--ink);border-color:var(--acc);box-shadow:inset 0 -3px 0 var(--acc)}
 .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
 .chip{font-size:12px;padding:4px 10px;border-radius:99px;border:1px solid;white-space:nowrap}
-.new{color:var(--r);border-color:var(--r)}.going{color:#b57b00;border-color:var(--y)}.done{color:var(--ok);border-color:var(--ok)}
+.new{color:var(--r);border-color:var(--r)}.going{color:#b57b00;border-color:#FAB31C}.done{color:var(--ok);border-color:var(--ok)}
 .mut{color:var(--mut);font-size:13px}ul{list-style:none;padding:10px 0 0}li{padding:3px 0}
+.tag{font-size:12px;color:var(--mut);border:1px solid var(--line);border-radius:99px;padding:1px 8px;margin-left:6px}
 a{color:inherit}.tglink{font-size:12px;color:var(--mut)}
 .empty{text-align:center;color:var(--mut);padding:40px 0}
-.hide{display:none}
-#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#161616;color:#fff;padding:11px 18px;border-radius:10px;opacity:0;transition:opacity .2s;pointer-events:none}
+.hide{display:none!important}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#161616;color:#fff;padding:11px 18px;border-radius:10px;opacity:0;transition:opacity .2s;pointer-events:none;border:1px solid #333}
 #toast.on{opacity:1}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<header><div class="brand"><img src="logo.png" alt="Homan"><span>delivery</span></div><button id="out" class="hide">Выйти</button></header>
+<header>
+  <div class="brand"><img src="logo.png" alt="Homan"><span>delivery</span></div>
+  <div class="hb">
+    <button id="th" aria-label="Сменить тему"><svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></button>
+    <button id="out" class="hide">Выйти</button>
+  </div>
+</header>
 <main>
   <section id="pick">
-    <h1 style="font-size:22px;margin-bottom:14px">Выберите раздел</h1>
+    <h1>Выберите раздел</h1>
     <div class="pick">
-      <button data-r="shop">Магазин<small>Создание заказов</small></button>
-      <button data-r="courier">Курьер<small>Доставка заказов</small></button>
+      <button class="shop" data-r="shop">Магазин<small>Создание заказов</small></button>
+      <button class="cour" data-r="courier">Курьер<small>Доставка заказов</small></button>
     </div>
   </section>
 
@@ -61,7 +82,7 @@ a{color:inherit}.tglink{font-size:12px;color:var(--mut)}
     <div id="newform" class="card hide">
       <h2 style="font-size:18px">Новый заказ</h2>
       <label for="n">Имя клиента</label><input id="n" autocomplete="off">
-      <label for="p">Телефон</label><input id="p" type="tel" placeholder="+998" autocomplete="off">
+      <label for="p">Телефон</label><input id="p" type="tel" inputmode="tel" value="+998 " autocomplete="off">
       <label for="a">Адрес</label><input id="a" autocomplete="off">
       <label>Техника</label><div id="items"></div>
       <button class="btn ghost full" id="add" style="margin-top:0">+ Добавить товар</button>
@@ -75,19 +96,22 @@ a{color:inherit}.tglink{font-size:12px;color:var(--mut)}
 <div id="toast"></div>
 <script>
 const $=s=>document.querySelector(s), ST={new:'Новый',going:'В пути',done:'Доставлен'};
-let role=null,tab='active',data={orders:[],bot:''},timer;
+let role=null,tab='active',data={orders:[],bot:''},timer,rid=0;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2400)};
+const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2600)};
 const show=id=>['pick','app'].forEach(x=>$('#'+x).classList.toggle('hide',x!==id));
 async function api(m,body){
   const r=await fetch('/api/orders',{method:m,headers:{'content-type':'application/json','x-role':role},body:body?JSON.stringify(body):undefined});
   const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Ошибка');return j}
-function row(){const d=document.createElement('div');d.className='row';
-  d.innerHTML='<input placeholder="Например: холодильник" aria-label="Товар"><input type="number" min="1" value="1" aria-label="Кол-во"><button class="x" aria-label="Удалить">×</button>';
+function fmt(v){let d=v.replace(/\D/g,'');if(d.startsWith('998'))d=d.slice(3);d=d.slice(0,9);
+  let s='+998 ';if(d.length)s+=d.slice(0,2);if(d.length>2)s+=' '+d.slice(2,5);if(d.length>5)s+=' '+d.slice(5,7);if(d.length>7)s+=' '+d.slice(7,9);return s}
+function row(){const n='s'+(++rid),d=document.createElement('div');d.className='item';
+  d.innerHTML='<div class="row"><input class="nm" placeholder="Например: холодильник" aria-label="Товар"><input class="q" type="number" min="1" value="1" aria-label="Количество"><button class="x" aria-label="Удалить">×</button></div>'+
+  '<div class="src"><label><input type="radio" name="'+n+'" value="Склад" checked><span>Склад</span></label><label><input type="radio" name="'+n+'" value="Магазин"><span>Магазин</span></label></div>';
   d.querySelector('.x').onclick=()=>{if($('#items').children.length>1)d.remove()};$('#items').append(d)}
 function render(){
   const act=data.orders.filter(o=>o.status!=='done'),his=data.orders.filter(o=>o.status==='done');
-  const L=(tab==='active'?act.slice().reverse():his);
+  const L=tab==='active'?act.slice().reverse():his;
   if(!L.length){$('#list').innerHTML='<p class="empty">'+(tab==='active'?'Активных заказов нет':'История пуста')+'</p>';return}
   $('#list').innerHTML=L.map(o=>{
     const t=new Date(o.created).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
@@ -98,21 +122,24 @@ function render(){
     return `<div class="card"><div class="top"><div><div class="b">${esc(o.name)}</div>
     <div class="mut"><a href="tel:${esc(o.phone)}">${esc(o.phone)}</a> · ${t}</div></div><span class="chip ${o.status}">${ST[o.status]}</span></div>
     <p style="margin-top:10px">${esc(o.address)}</p>
-    <ul>${o.items.map(i=>`<li>${esc(i.name)} × ${i.qty}</li>`).join('')}</ul>
+    <ul>${o.items.map(i=>`<li>${esc(i.name)} × ${i.qty}<span class="tag">${esc(i.from||'Склад')}</span></li>`).join('')}</ul>
     ${o.comment?`<p class="mut" style="margin-top:8px">${esc(o.comment)}</p>`:''}${link}${act}</div>`}).join('')}
 async function load(){try{data=await api('GET');render()}catch(e){}}
-function start(){show('app');$('#out').classList.remove('hide');$('#newform').classList.toggle('hide',role!=='shop');
+function start(){document.body.dataset.role=role;show('app');$('#out').classList.remove('hide');$('#newform').classList.toggle('hide',role!=='shop');
   if(!$('#items').children.length)row();load();clearInterval(timer);timer=setInterval(load,8000)}
-function enter(r){role=r;sessionStorage.role=r;start()}
-document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>enter(b.dataset.r));
-$('#out').onclick=()=>{sessionStorage.clear();clearInterval(timer);$('#out').classList.add('hide');show('pick')};
+document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{role=b.dataset.r;sessionStorage.role=role;start()});
+$('#out').onclick=()=>{sessionStorage.clear();role=null;delete document.body.dataset.role;clearInterval(timer);$('#out').classList.add('hide');show('pick')};
+$('#th').onclick=()=>{const d=document.documentElement,n=d.dataset.theme==='dark'?'light':'dark';d.dataset.theme=n;try{localStorage.theme=n}catch(e){}};
+$('#p').oninput=e=>{e.target.value=fmt(e.target.value)};
+$('#p').onfocus=e=>{if(!e.target.value)e.target.value='+998 '};
 $('#add').onclick=row;
 document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{tab=b.dataset.t;document.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x===b));render()});
 $('#send').onclick=async()=>{
-  const items=[...$('#items').children].map(r=>({name:r.children[0].value,qty:r.children[1].value}));
+  if($('#p').value.replace(/\D/g,'').length!==12){toast('Введите номер полностью');return}
+  const items=[...document.querySelectorAll('#items .item')].map(r=>({name:r.querySelector('.nm').value,qty:r.querySelector('.q').value,from:r.querySelector('input[type=radio]:checked').value}));
   $('#send').disabled=true;
   try{await api('POST',{name:$('#n').value,phone:$('#p').value,address:$('#a').value,items,comment:$('#c').value});
-    ['n','p','a','c'].forEach(i=>$('#'+i).value='');$('#items').innerHTML='';row();toast('Заказ отправлен');load()}
+    ['n','a','c'].forEach(i=>$('#'+i).value='');$('#p').value='+998 ';$('#items').innerHTML='';row();toast('Заказ отправлен');load()}
   catch(e){toast(e.message)}$('#send').disabled=false};
 $('#list').onclick=async e=>{const b=e.target.closest('[data-id]');if(!b)return;b.disabled=true;
   try{await api('PATCH',{id:b.dataset.id,status:b.dataset.s});load()}catch(x){toast(x.message);b.disabled=false}};
