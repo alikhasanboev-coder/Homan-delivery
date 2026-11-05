@@ -55,6 +55,9 @@ input:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:-1px}
 .tag{font-size:12px;color:var(--mut);border:1px solid var(--line);border-radius:99px;padding:1px 8px;margin-left:6px}
 a{color:inherit}.tglink{font-size:12px;color:var(--mut)}
 .empty{text-align:center;color:var(--mut);padding:40px 0}
+.btn.line{background:none;border:1px solid var(--line);color:var(--ink)}.btn.line.dng{color:var(--r);border-color:var(--r)}
+.acts{display:flex;gap:8px;margin-top:14px}.acts .btn{flex:1;padding:10px;font-size:14px}
+.cancelled{color:var(--mut);border-color:var(--line)}.dim{opacity:.6}
 .hide{display:none!important}
 #toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#161616;color:#fff;padding:11px 18px;border-radius:10px;opacity:0;transition:opacity .2s;pointer-events:none;border:1px solid #333}
 #toast.on{opacity:1}
@@ -80,7 +83,7 @@ a{color:inherit}.tglink{font-size:12px;color:var(--mut)}
 
   <section id="app" class="hide">
     <div id="newform" class="card hide">
-      <h2 style="font-size:18px">Новый заказ</h2>
+      <h2 id="ft" style="font-size:18px">Новый заказ</h2>
       <label for="n">Имя клиента</label><input id="n" autocomplete="off">
       <label for="p">Телефон</label><input id="p" type="tel" inputmode="tel" value="+998 " autocomplete="off">
       <label for="a">Адрес</label><input id="a" autocomplete="off">
@@ -88,6 +91,7 @@ a{color:inherit}.tglink{font-size:12px;color:var(--mut)}
       <button class="btn ghost full" id="add" style="margin-top:0">+ Добавить товар</button>
       <label for="c">Комментарий</label><textarea id="c" rows="2"></textarea>
       <button class="btn full" id="send">Отправить заказ</button>
+      <button class="btn line full hide" id="canc" style="margin-top:10px">Отменить редактирование</button>
     </div>
     <div class="tabs"><button data-t="active" class="on">Активные</button><button data-t="history">История</button></div>
     <div id="list"></div>
@@ -95,8 +99,8 @@ a{color:inherit}.tglink{font-size:12px;color:var(--mut)}
 </main>
 <div id="toast"></div>
 <script>
-const $=s=>document.querySelector(s), ST={new:'Новый',going:'В пути',done:'Доставлен'};
-let role=null,tab='active',data={orders:[],bot:''},timer,rid=0;
+const $=s=>document.querySelector(s), ST={new:'Новый',going:'В пути',done:'Доставлен',cancelled:'Отменён'};
+let role=null,tab='active',data={orders:[],bot:''},timer,rid=0,editId=null;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2600)};
 const show=id=>['pick','app'].forEach(x=>$('#'+x).classList.toggle('hide',x!==id));
@@ -105,12 +109,12 @@ async function api(m,body){
   const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Ошибка');return j}
 function fmt(v){let d=v.replace(/\D/g,'');if(d.startsWith('998'))d=d.slice(3);d=d.slice(0,9);
   let s='+998 ';if(d.length)s+=d.slice(0,2);if(d.length>2)s+=' '+d.slice(2,5);if(d.length>5)s+=' '+d.slice(5,7);if(d.length>7)s+=' '+d.slice(7,9);return s}
-function row(){const n='s'+(++rid),d=document.createElement('div');d.className='item';
+function row(it){const n='s'+(++rid),d=document.createElement('div');d.className='item';
   d.innerHTML='<div class="row"><input class="nm" placeholder="Например: холодильник" aria-label="Товар"><input class="q" type="number" min="1" value="1" aria-label="Количество"><button class="x" aria-label="Удалить">×</button></div>'+
   '<div class="src"><label><input type="radio" name="'+n+'" value="Склад" checked><span>Склад</span></label><label><input type="radio" name="'+n+'" value="Магазин"><span>Магазин</span></label></div>';
-  d.querySelector('.x').onclick=()=>{if($('#items').children.length>1)d.remove()};$('#items').append(d)}
+  d.querySelector('.x').onclick=()=>{if($('#items').children.length>1)d.remove()};if(it){d.querySelector('.nm').value=it.name;d.querySelector('.q').value=it.qty;d.querySelector('input[value="'+(it.from==='Магазин'?'Магазин':'Склад')+'"]').checked=true}$('#items').append(d)}
 function render(){
-  const act=data.orders.filter(o=>o.status!=='done'),his=data.orders.filter(o=>o.status==='done');
+  const act=data.orders.filter(o=>o.status==='new'||o.status==='going'),his=data.orders.filter(o=>o.status==='done'||o.status==='cancelled');
   const L=tab==='active'?act.slice().reverse():his;
   if(!L.length){$('#list').innerHTML='<p class="empty">'+(tab==='active'?'Активных заказов нет':'История пуста')+'</p>';return}
   $('#list').innerHTML=L.map(o=>{
@@ -118,12 +122,13 @@ function render(){
     let act='';
     if(role==='courier'&&o.status==='new')act=`<button class="btn full" data-id="${o.id}" data-s="going">Выехал</button>`;
     if(role==='courier'&&o.status==='going')act=`<button class="btn red full" data-id="${o.id}" data-s="done">Доставлен</button>`;
+    const edit=role==='shop'&&(o.status==='new'||o.status==='going')?`<div class="acts"><button class="btn line" data-edit="${o.id}">Изменить</button><button class="btn line dng" data-cancel="${o.id}">Отменить заказ</button></div>`:'';
     const link=role==='shop'&&o.status!=='done'&&!o.linked&&data.bot?`<p class="tglink" style="margin-top:8px">Клиент не подключил Telegram: t.me/${esc(data.bot)}</p>`:'';
-    return `<div class="card"><div class="top"><div><div class="b">${esc(o.name)}</div>
+    return `<div class="card${o.status==='cancelled'?' dim':''}"><div class="top"><div><div class="b">${esc(o.name)}</div>
     <div class="mut"><a href="tel:${esc(o.phone)}">${esc(o.phone)}</a> · ${t}</div></div><span class="chip ${o.status}">${ST[o.status]}</span></div>
     <p style="margin-top:10px">${esc(o.address)}</p>
     <ul>${o.items.map(i=>`<li>${esc(i.name)} × ${i.qty}<span class="tag">${esc(i.from||'Склад')}</span></li>`).join('')}</ul>
-    ${o.comment?`<p class="mut" style="margin-top:8px">${esc(o.comment)}</p>`:''}${link}${act}</div>`}).join('')}
+    ${o.comment?`<p class="mut" style="margin-top:8px">${esc(o.comment)}</p>`:''}${link}${act}${edit}</div>`}).join('')}
 async function load(){try{data=await api('GET');render()}catch(e){}}
 function start(){document.body.dataset.role=role;show('app');$('#out').classList.remove('hide');$('#newform').classList.toggle('hide',role!=='shop');
   if(!$('#items').children.length)row();load();clearInterval(timer);timer=setInterval(load,8000)}
@@ -134,15 +139,24 @@ $('#p').oninput=e=>{e.target.value=fmt(e.target.value)};
 $('#p').onfocus=e=>{if(!e.target.value)e.target.value='+998 '};
 $('#add').onclick=row;
 document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{tab=b.dataset.t;document.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x===b));render()});
+function resetForm(){editId=null;['n','a','c'].forEach(i=>$('#'+i).value='');$('#p').value='+998 ';$('#items').innerHTML='';row();$('#ft').textContent='Новый заказ';$('#send').textContent='Отправить заказ';$('#canc').classList.add('hide')}
+function edit(o){editId=o.id;$('#n').value=o.name;$('#p').value=fmt(o.phone);$('#a').value=o.address;$('#c').value=o.comment||'';$('#items').innerHTML='';o.items.forEach(i=>row(i));$('#ft').textContent='Изменить заказ';$('#send').textContent='Сохранить изменения';$('#canc').classList.remove('hide');window.scrollTo({top:0,behavior:'smooth'})}
+$('#canc').onclick=resetForm;
 $('#send').onclick=async()=>{
   if($('#p').value.replace(/\D/g,'').length!==12){toast('Введите номер полностью');return}
   const items=[...document.querySelectorAll('#items .item')].map(r=>({name:r.querySelector('.nm').value,qty:r.querySelector('.q').value,from:r.querySelector('input[type=radio]:checked').value}));
+  const b={name:$('#n').value,phone:$('#p').value,address:$('#a').value,items,comment:$('#c').value};
   $('#send').disabled=true;
-  try{await api('POST',{name:$('#n').value,phone:$('#p').value,address:$('#a').value,items,comment:$('#c').value});
-    ['n','a','c'].forEach(i=>$('#'+i).value='');$('#p').value='+998 ';$('#items').innerHTML='';row();toast('Заказ отправлен');load()}
+  try{if(editId){await api('PUT',{...b,id:editId});toast('Изменения сохранены')}else{await api('POST',b);toast('Заказ отправлен')}
+    resetForm();load()}
   catch(e){toast(e.message)}$('#send').disabled=false};
-$('#list').onclick=async e=>{const b=e.target.closest('[data-id]');if(!b)return;b.disabled=true;
-  try{await api('PATCH',{id:b.dataset.id,status:b.dataset.s});load()}catch(x){toast(x.message);b.disabled=false}};
+$('#list').onclick=async e=>{
+  const f=e.target.closest('[data-id]'),ed=e.target.closest('[data-edit]'),ca=e.target.closest('[data-cancel]');
+  if(ed){const o=data.orders.find(x=>x.id===ed.dataset.edit);if(o)edit(o);return}
+  if(ca){if(!confirm('Отменить этот заказ?'))return;
+    try{await api('PATCH',{id:ca.dataset.cancel,status:'cancelled'});if(editId===ca.dataset.cancel)resetForm();toast('Заказ отменён');load()}catch(x){toast(x.message)}return}
+  if(!f)return;f.disabled=true;
+  try{await api('PATCH',{id:f.dataset.id,status:f.dataset.s});load()}catch(x){toast(x.message);f.disabled=false;load()}};
 if(sessionStorage.role){role=sessionStorage.role;start()}
 </script>
 </body>

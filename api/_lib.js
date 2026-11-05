@@ -23,5 +23,8 @@ export const sheet = (order) =>
     ? fetch(process.env.GOOGLE_SCRIPT_URL, {
         method: 'POST', headers: { 'content-type': 'text/plain' },
         body: JSON.stringify({ secret: process.env.GOOGLE_SCRIPT_SECRET, order }),
-      }).catch(() => {})
+      })
+        .then((r) => r.text())
+        .then((t) => { if (t !== 'ok') console.error('SHEETS:', t.slice(0, 300)); })
+        .catch((e) => console.error('SHEETS ERROR:', e.message))
     : Promise.resolve();
