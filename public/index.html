@@ -22,12 +22,12 @@ header button{background:none;border:1px solid #3a3a3e;color:#cfcfd2;border-radi
 header svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 #th .sun{display:none}html[data-theme=dark] #th .sun{display:block}html[data-theme=dark] #th .moon{display:none}
 main{max-width:760px;margin:0 auto;padding:24px 16px 80px}
-#pick{min-height:calc(100vh - 150px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+#pick{min-height:calc(100vh - 150px);padding-bottom:14vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 #pick h1{font-size:24px;margin-bottom:20px}
-.pick{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:520px}
-.pick button{padding:46px 14px;border:0;border-radius:16px;font:700 20px Actay,system-ui;cursor:pointer;transition:transform .15s}
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:17px;width:100%;max-width:624px}
+.pick button{padding:55px 16px;border:0;border-radius:19px;font:700 24px Actay,system-ui;cursor:pointer;transition:transform .15s}
 .pick button:hover{transform:translateY(-2px)}.pick button:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
-.pick small{display:block;font:400 13px Actay,system-ui;margin-top:6px;opacity:.8}
+.pick small{display:block;font:400 16px Actay,system-ui;margin-top:7px;opacity:.8}
 .shop{background:#2563EB;color:#fff}.cour{background:#FAB31C;color:#161616}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:12px}
 label{display:block;font-size:13px;color:var(--mut);margin:12px 0 5px}
@@ -58,6 +58,35 @@ a{color:inherit}.tglink{font-size:12px;color:var(--mut)}
 .btn.line{background:none;border:1px solid var(--line);color:var(--ink)}.btn.line.dng{color:var(--r);border-color:var(--r)}
 .acts{display:flex;gap:8px;margin-top:14px}.acts .btn{flex:1;padding:10px;font-size:14px}
 .cancelled{color:var(--mut);border-color:var(--line)}.dim{opacity:.6}
+:root{--w1:rgba(37,99,235,.28);--w2:rgba(37,99,235,.18);--w3:rgba(37,99,235,.10)}
+html[data-theme=dark]{--w1:rgba(59,130,246,.30);--w2:rgba(59,130,246,.20);--w3:rgba(59,130,246,.12)}
+header,main{position:relative;z-index:1}
+.sea{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+body[data-role] .sea{display:none}
+.wave{position:absolute;left:0;bottom:0;width:200%;will-change:transform}
+.wave path{fill:var(--w3)}
+.w3{height:30vh;animation:flow 30s linear infinite reverse}
+.w2{height:24vh;animation:flow 20s linear infinite}.w2 path{fill:var(--w2)}
+.w1{height:18vh;animation:flow 13s linear infinite reverse}.w1 path{fill:var(--w1)}
+.chip{background:#0a0a0a;border-radius:14px;padding:11px 15px;box-shadow:0 6px 18px rgba(0,0,0,.2);animation:bob var(--b) ease-in-out infinite}.chip img{display:block;width:100%}
+@keyframes flow{to{transform:translateX(-50%)}}
+.fl{position:absolute;left:-140px;width:var(--s);will-change:transform;animation:drift var(--d) linear infinite;animation-delay:var(--l)}
+.ic{display:block;width:100%;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;color:var(--ink);opacity:.5;animation:bob var(--b) ease-in-out infinite}
+@keyframes drift{to{transform:translateX(calc(100vw + 280px))}}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-14px) rotate(5deg)}}
+@media(max-width:600px){.fl.x{display:none}}
+@media(prefers-reduced-motion:reduce){.sea *{animation:none!important}.fl{left:var(--x,12%)}}
+@font-face{font-family:BebasNote;src:url(fonts/BebasNoteBold.ttf)}
+.dv{display:flex;align-items:center;gap:8px;padding-left:14px;border-left:1px solid #444;color:#FAB31C}
+.dv svg{width:34px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+.dv .tr{animation:rumble 1.2s ease-in-out infinite}
+.dv .sp{stroke-dasharray:3 3;animation:dash .7s linear infinite}
+.dv b{font:400 21px/1 BebasNote,Actay,sans-serif;letter-spacing:.08em;color:#fff;padding-top:2px}
+.dv b::first-letter{font-size:1.3em}
+@keyframes rumble{50%{transform:translateY(-1.5px)}}
+@keyframes dash{to{stroke-dashoffset:-6}}
+@media(max-width:480px){.brand{gap:10px}.dv{padding-left:10px;gap:5px}.dv svg{width:30px}.dv b{font-size:18px;letter-spacing:.06em}}
+@media(prefers-reduced-motion:reduce){.dv *{animation:none!important}}
 .hide{display:none!important}
 #toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#161616;color:#fff;padding:11px 18px;border-radius:10px;opacity:0;transition:opacity .2s;pointer-events:none;border:1px solid #333}
 #toast.on{opacity:1}
@@ -65,8 +94,23 @@ a{color:inherit}.tglink{font-size:12px;color:var(--mut)}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="i-fr" viewBox="0 0 64 64"><rect x="18" y="6" width="28" height="52" rx="4"/><path d="M18 26h28M24 14v6M24 32v10"/></symbol>
+<symbol id="i-wm" viewBox="0 0 64 64"><rect x="10" y="8" width="44" height="48" rx="5"/><circle cx="32" cy="34" r="12"/><circle cx="32" cy="34" r="5"/><path d="M18 16h2M26 16h20"/></symbol>
+<symbol id="i-tv" viewBox="0 0 64 64"><rect x="8" y="14" width="48" height="32" rx="4"/><path d="M24 54h16M32 46v8"/></symbol>
+<symbol id="i-mw" viewBox="0 0 64 64"><rect x="6" y="16" width="52" height="32" rx="4"/><rect x="12" y="22" width="28" height="20" rx="2"/><path d="M48 24v2M48 33v2M48 41v1"/></symbol>
+<symbol id="i-ac" viewBox="0 0 64 64"><rect x="6" y="14" width="52" height="20" rx="4"/><path d="M12 28h40M18 42q4 6 0 12M32 42q4 6 0 12M46 42q4 6 0 12"/></symbol>
+<symbol id="i-kt" viewBox="0 0 64 64"><path d="M20 24h24l4 28a4 4 0 0 1-4 4H20a4 4 0 0 1-4-4zM24 24v-4h16v4M48 30c10 0 10 14 0 14"/></symbol>
+</defs></svg>
+<div class="sea" aria-hidden="true">
+<svg class="wave w3" viewBox="0 0 1440 200" preserveAspectRatio="none"><path d="M0 60C120 20 240 20 360 60S600 100 720 60S960 20 1080 60S1320 100 1440 60V200H0Z"/></svg>
+<div class="fl " style="--x:6%;--s:70px;--d:95s;--l:-10s;--b:5.5s;bottom:15vh"><svg class="ic"><use href="#i-fr"/></svg></div><div class="fl x" style="--x:22%;--s:78px;--d:80s;--l:-48s;--b:6.5s;bottom:15vh"><svg class="ic"><use href="#i-wm"/></svg></div><div class="fl " style="--x:55%;--s:90px;--d:110s;--l:-70s;--b:5s;bottom:16vh"><svg class="ic"><use href="#i-tv"/></svg></div><div class="fl x" style="--x:38%;--s:76px;--d:88s;--l:-30s;--b:6s;bottom:14vh"><svg class="ic"><use href="#i-mw"/></svg></div><div class="fl " style="--x:72%;--s:92px;--d:100s;--l:-85s;--b:7s;bottom:15vh"><svg class="ic"><use href="#i-ac"/></svg></div><div class="fl " style="--x:86%;--s:60px;--d:75s;--l:-60s;--b:4.5s;bottom:16vh"><svg class="ic"><use href="#i-kt"/></svg></div>
+<div class="fl" style="--x:46%;--s:170px;--d:105s;--l:-38s;--b:5.5s;bottom:17vh"><div class="chip"><img alt="" src="logo.png"></div></div>
+<svg class="wave w2" viewBox="0 0 1440 200" preserveAspectRatio="none"><path d="M0 60C120 20 240 20 360 60S600 100 720 60S960 20 1080 60S1320 100 1440 60V200H0Z"/></svg>
+<svg class="wave w1" viewBox="0 0 1440 200" preserveAspectRatio="none"><path d="M0 60C120 20 240 20 360 60S600 100 720 60S960 20 1080 60S1320 100 1440 60V200H0Z"/></svg>
+</div>
 <header>
-  <div class="brand"><img src="logo.png" alt="Homan"><span>delivery</span></div>
+  <div class="brand"><img src="logo.png" alt="Homan"><div class="dv"><svg viewBox="0 0 40 24" aria-hidden="true"><path class="sp" d="M1 8h5M0 12h6M2 16h4"/><g class="tr"><rect x="9" y="4" width="16" height="12" rx="2"/><path d="M25 8h5l4 4v4h-9z"/><circle cx="14" cy="18" r="2.5" fill="#0a0a0a"/><circle cx="30" cy="18" r="2.5" fill="#0a0a0a"/></g></svg><b>Delivery</b></div></div>
   <div class="hb">
     <button id="th" aria-label="Сменить тему"><svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></button>
     <button id="out" class="hide">Выйти</button>
